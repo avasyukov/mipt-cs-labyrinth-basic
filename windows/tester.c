@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <windows.h>
+#include <windows.h>
 #include <time.h>
 
 #include "player_data.h"
@@ -262,7 +262,7 @@ int main()
 			printf("Player %d. Scores: %d\n", i, scores[i]);
 
 		step++;
-		Sleep(1);
+		Sleep(1000);
 	}
 
 	return 0;
