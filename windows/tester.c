@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
+//#include <windows.h>
 #include <time.h>
 
 #include "player_data.h"
@@ -15,11 +15,13 @@
 
 int continue_game(int step) {
 
+	int x, y;
+
 	if(step > STEPS)
 		return 0;
 
-	for (int x = 0; x < MAX_X; x++)
-		for (int y = 0; y < MAX_Y; y++)
+	for (x = 0; x < MAX_X; x++)
+		for (y = 0; y < MAX_Y; y++)
 			if (clear_map[y][x] == '*')
 				return 1;
 
@@ -27,11 +29,11 @@ int continue_game(int step) {
 };
 
 
-struct monster {
+typedef struct monster {
 	int x;
 	int y;
 	int alive;
-};
+} monster;
 
 monster monsters[NUM_OF_MONSTERS];
 
@@ -40,14 +42,16 @@ int scores[PLAYERS];
 
 void check_killed_monsters(int x, int y)
 {
-	for(int i = 0; i < NUM_OF_MONSTERS; i++)
+	int i;
+	for(i = 0; i < NUM_OF_MONSTERS; i++)
 		if( (monsters[i].x == x) && (monsters[i].y == y) )
 			monsters[i].alive = 0;
 };
 
 void check_attacked_players(int num)
 {
-	for( int i = 0; i < PLAYERS; i++) {
+	int i;
+	for(i = 0; i < PLAYERS; i++) {
 		if( (player_data[i][0] == monsters[num].x) && (player_data[i][1] == monsters[num].y) ) {
 			scores[i] -= 1000;
 			monsters[num].alive = 0;
@@ -82,7 +86,8 @@ void process_monster_move(int num, int next_move)
 
 void move_monsters()
 {
-	for(int i = 0; i < NUM_OF_MONSTERS; i++)
+	int i;
+	for(i = 0; i < NUM_OF_MONSTERS; i++)
 		if( monsters[i].alive == 1 ) {
 			process_monster_move(i, rand() % 5);
 			check_attacked_players(i);
@@ -103,7 +108,8 @@ void get_random_place(int* x, int* y)
 
 void init_monsters()
 {
-	for(int i = 0; i < NUM_OF_MONSTERS; i++) {
+	int i;
+	for(i = 0; i < NUM_OF_MONSTERS; i++) {
 		monsters[i].alive = 1;
 		get_random_place(&monsters[i].x, &monsters[i].y);
 	}
@@ -113,7 +119,8 @@ void init_treasures()
 {
 	int x;
 	int y;
-	for(int i = 0; i < NUM_OF_TREASURES; i++) {
+	int i;
+	for(i = 0; i < NUM_OF_TREASURES; i++) {
 		get_random_place(&x, &y);
 		clear_map[y][x] = '*';
 	}
@@ -121,16 +128,17 @@ void init_treasures()
 
 void print_map(int* player_data[], int num)
 {
+	int i, j;
 	char local_map[MAX_Y][MAX_X];
 	memcpy(local_map, map, MAX_Y * MAX_X * sizeof(char));
 
-	for( int i = 0; i < num; i++)
+	for(i = 0; i < num; i++)
 		local_map[ player_data[i][1] ][ player_data[i][0] ] = '1' + i;
 
 	system("cls");
 
-	for(int i = 0; i < MAX_Y; i++) {
-		for(int j = 0; j < MAX_X; j++)
+	for(i = 0; i < MAX_Y; i++) {
+		for(j = 0; j < MAX_X; j++)
 			if(local_map[i][j] == '.')
 				printf("%c", local_map[i][j]);
 			else if (local_map[i][j] == '#')
@@ -186,10 +194,11 @@ int process_next_move(int *player_x, int *player_y, int next_move)
 
 void update_player_map()
 {
-	for (int x = 0; x < MAX_X; x++)
-		for (int y = 0; y < MAX_Y; y++)
+	int x, y, i;
+	for (x = 0; x < MAX_X; x++)
+		for (y = 0; y < MAX_Y; y++)
 			map[y][x] = clear_map[y][x];
-	for(int i = 0; i < NUM_OF_MONSTERS; i++)
+	for(i = 0; i < NUM_OF_MONSTERS; i++)
 		if( monsters[i].alive == 1 )
 			map[monsters[i].y][monsters[i].x] = '@';
 
@@ -197,24 +206,26 @@ void update_player_map()
 
 void update_main_map()
 {
+	int i;
 	memcpy(map, clear_map, MAX_Y * MAX_X * sizeof(char));
-	for(int i = 0; i < NUM_OF_MONSTERS; i++)
+	for(i = 0; i < NUM_OF_MONSTERS; i++)
 		if( monsters[i].alive == 1 )
 			map[monsters[i].y][monsters[i].x] = '@';
 };
 
 int main()
 {
+	int i;
 	srand(time(NULL)) ;
 
-	for( int i = 0; i < PLAYERS; i++) 
+	for(i = 0; i < PLAYERS; i++) 
 		player_data[i] = (int*)malloc(4*sizeof(int));
 
 	// player_x && player_y
-	for( int i = 0; i < PLAYERS; i++) 
+	for(i = 0; i < PLAYERS; i++) 
 		get_random_place(&player_data[i][0], &player_data[i][1]);
 
-	for( int i = 0; i < PLAYERS; i++) {
+	for(i = 0; i < PLAYERS; i++) {
 		// Next move undefined
 		player_data[i][2] = -1;
 		// Game online
@@ -237,7 +248,7 @@ int main()
 		update_main_map();
 
 		print_map(player_data, PLAYERS);
-		for( int i = 0; i < PLAYERS; i++) {
+		for(i = 0; i < PLAYERS; i++) {
 			do_next_step( player_data[i][0], player_data[i][1], &player_data[i][2] );
 			if( player_data[i][2] != -1 ) {
 				scores[i] += process_next_move(&player_data[i][0], &player_data[i][1], player_data[i][2]);
@@ -247,7 +258,7 @@ int main()
 		}
 
 		printf("Step %d\n", step);
-		for( int i = 0; i < PLAYERS; i++)
+		for(i = 0; i < PLAYERS; i++)
 			printf("Player %d. Scores: %d\n", i, scores[i]);
 
 		step++;

@@ -2,14 +2,15 @@
 
 void find_nearest_treasure(int cur_x, int cur_y, int* treasure_x, int* treasure_y)
 {
+	int x, y;
 	// Init distance with smth really big
 	int min_distance = MAX_X + MAX_Y;
 	int target_x; 
 	int target_y;
 
 	// Scan the map
-	for(int y = 0; y < MAX_Y; y++) {
-		for(int x = 0; x < MAX_X; x++) {
+	for(y = 0; y < MAX_Y; y++) {
+		for(x = 0; x < MAX_X; x++) {
 			// If you see the treasure - ...
 			if(map[y][x] == '*') {
 				// ... calculate the distance (naive distance measure)
